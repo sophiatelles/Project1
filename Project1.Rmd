@@ -1,0 +1,302 @@
+---
+title: "Project 1"
+author: "Sophia Telles & Samantha Driscoll"
+date: "October 20, 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+load(file="providerspokane.rda")
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+```
+
+# Spokane Providers
+## Intro
+
+Medical providers in the Spokane area can be analyzed as a function of Gender of the provider, type of service provided, and place of service. These factors, when analyzed as functions of variables such as Medicare coverage, tell us a lot about what services in the medical field are used the most frequently, cost the most money, and have the most Medicare coverage. 
+
+## Question 1 
+Are there differences in the number of services, distinct beneficiary per day services, average medicare allowed, charged, and paid amount, and medicare standardized amount differ as a function of Gender, the Provider Type, and Place of Service?
+
+# Gender 
+
+## Number of Services and Gender
+```{r}
+ServicesG=providerspokane%>%group_by(Gender=Gender.of.the.Provider)%>%summarize(NumberofServices =sum(Number.of.Services))
+ServicesG[ServicesG==""] <-NA
+ServicesG = ServicesG[complete.cases(ServicesG),]
+```
+
+We have some service providers that did not specify Gender, so we discovered a way to eliminate this variable of the data. 
+
+```{r}
+ggplot(ServicesG,aes(Gender,NumberofServices,fill=Gender))+geom_bar(stat="identity")+scale_fill_manual(values=c("magenta","blue"))+ylab("Number of Services")+ggtitle("Gender by Number of Services")
+
+```
+
+## Number of Beneficiary per day Services and Gender
+```{r}
+BeneficiaryG=providerspokane%>%group_by(Gender = Gender.of.the.Provider)%>%summarize(NumberofBeneficiary=sum(Number.of.Distinct.Medicare.Beneficiary.Per.Day.Services))
+BeneficiaryG[BeneficiaryG==""] <-NA
+BeneficiaryG = BeneficiaryG[complete.cases(BeneficiaryG),]
+```
+
+```{r}
+ggplot(BeneficiaryG,aes(Gender,NumberofBeneficiary,fill=Gender))+geom_bar(stat="identity")+scale_fill_manual(values=c("magenta","blue"))+ylab("Number of Beneficiaries")+ggtitle("Gender by Numberof Beneficiary per day services")
+```
+## Average Medicare Allowed and Gender
+```{r}
+AllowedG=providerspokane%>%group_by(Gender=Gender.of.the.Provider)%>%summarize(AllowedAmmount=mean(Average.Medicare.Allowed.Amount))
+AllowedG[AllowedG==""] <-NA
+AllowedG = AllowedG[complete.cases(AllowedG),]
+
+```
+
+```{r}
+ggplot(AllowedG,aes(Gender,AllowedAmmount,fill=Gender))+geom_bar(stat="identity")+scale_fill_manual(values=c("magenta","blue"))+ylab("Average Medicare Allowed")+ggtitle("Gender by Average Medicare Allowed")
+```
+
+
+## Average Submitted Charge Amount and Gender
+```{r}
+ChargedG=providerspokane%>%group_by(Gender=Gender.of.the.Provider)%>%summarize(ChargedAmmount=mean(Average.Submitted.Charge.Amount))
+ChargedG[ChargedG==""] <-NA
+ChargedG = ChargedG[complete.cases(ChargedG),]
+
+```
+
+```{r}
+ggplot(ChargedG,aes(Gender,ChargedAmmount,fill=Gender))+geom_bar(stat="identity")+scale_fill_manual(values=c("magenta","blue"))+ylab("Average Submitted Charge Amount")+ggtitle("Gender by Submitted Charge Amount")
+```
+
+## Average Medicare Payment Amount and Gender
+```{r}
+PaymentG=providerspokane%>%group_by(Gender=Gender.of.the.Provider)%>%summarize(PaymentAmmount=mean(Average.Medicare.Payment.Amount))
+PaymentG[PaymentG==""] <-NA
+PaymentG = PaymentG[complete.cases(PaymentG),]
+
+```
+
+```{r}
+ggplot(PaymentG,aes(Gender,PaymentAmmount,fill=Gender))+geom_bar(stat="identity")+scale_fill_manual(values=c("magenta","blue"))+ylab("Average Medicare Payment Amount")+ggtitle("Gender by Average Medicare Payment Amount")
+```
+
+## Average Medicare Standardized Amount and Gender
+```{r}
+StandardG=providerspokane%>%group_by(Gender=Gender.of.the.Provider)%>%summarize(StandardAmmount=mean(Average.Medicare.Standardized.Amount))
+StandardG[StandardG==""] <-NA
+StandardG = StandardG[complete.cases(StandardG),]
+
+```
+
+```{r}
+ggplot(StandardG,aes(Gender,StandardAmmount,fill=Gender))+geom_bar(stat="identity")+scale_fill_manual(values=c("magenta","blue"))+ylab("Average Medicare Standard Amount")+ggtitle("Gender by Average Medicare Standardized Amount")
+```
+
+
+# Provider Type
+
+## Number of Services and Provider Type
+
+```{r}
+ServicesP=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(NumberofServices =sum(Number.of.Services))
+ServicesP <- ServicesP[order(-ServicesP$NumberofServices),]
+ServicesP<-ServicesP[1:20,]
+ServicesPs=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(NumberofServices =sum(Number.of.Services))
+ServicesPs <- ServicesPs[order(-ServicesPs$NumberofServices),]
+ServicesPs <-ServicesPs[21:45,]
+ServicesPt=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(NumberofServices =sum(Number.of.Services))
+ServicesPt <- ServicesPt[order(-ServicesPt$NumberofServices),]
+ServicesPt <-ServicesPt[46:70,]
+```
+
+```{r}
+ggplot(ServicesP,aes(reorder(Provider,NumberofServices),NumberofServices,fill=NumberofServices))+geom_bar(stat="identity")+coord_flip()+ylab("Number of Services")+xlab("Provider Type")+ggtitle("Provider Type 1-20 categorized by Number of Services")
+ggplot(ServicesPs,aes(reorder(Provider,NumberofServices),NumberofServices,fill=NumberofServices))+geom_bar(stat="identity")+coord_flip()+ylab("Number of Services")+xlab("Provider Type")+ggtitle("Provider Type 21-46 categorized by Number of Services")
+ggplot(ServicesPt,aes(reorder(Provider,NumberofServices),NumberofServices,fill=NumberofServices))+geom_bar(stat="identity")+coord_flip()+ylab("Number of Services")+xlab("Provider Type")+ggtitle("Provider Type 46-70 categorized by Number of Services")
+```
+
+## Number of Beneficiary per day Services and Provider Type
+
+```{r}
+BeneficiaryP=providerspokane%>%group_by(Provider =Provider.Type)%>%summarize(NumberofBeneficiary=sum(Number.of.Distinct.Medicare.Beneficiary.Per.Day.Services))
+BeneficiaryP <- BeneficiaryP[order(-BeneficiaryP$NumberofBeneficiary),]
+BeneficiaryP <- BeneficiaryP[1:20,]
+BeneficiaryPs=providerspokane%>%group_by(Provider =Provider.Type)%>%summarize(NumberofBeneficiary=sum(Number.of.Distinct.Medicare.Beneficiary.Per.Day.Services))
+BeneficiaryPs <- BeneficiaryPs[order(-BeneficiaryPs$NumberofBeneficiary),]
+BeneficiaryPs <- BeneficiaryPs[21:45,]
+BeneficiaryPt=providerspokane%>%group_by(Provider =Provider.Type)%>%summarize(NumberofBeneficiary=sum(Number.of.Distinct.Medicare.Beneficiary.Per.Day.Services))
+BeneficiaryPt <- BeneficiaryPt[order(-BeneficiaryPt$NumberofBeneficiary),]
+BeneficiaryPt <- BeneficiaryPt[46:70,]
+```
+
+```{r}
+ggplot(BeneficiaryP,aes(reorder(Provider,NumberofBeneficiary),NumberofBeneficiary, fill=NumberofBeneficiary))+geom_bar(stat="identity")+coord_flip()+ylab("Number of Beneficiary per Day Services")+xlab("Provider")+ggtitle("Provider Type 1-20 categorized by Beneficiary per Day services")
+ggplot(BeneficiaryPs,aes(reorder(Provider,NumberofBeneficiary),NumberofBeneficiary, fill=NumberofBeneficiary))+geom_bar(stat="identity")+coord_flip()+ylab("Number of Beneficiary per Day Services")+xlab("Provider")+ggtitle("Provider Type 21-45 categorized by Beneficiary per Day services")
+ggplot(BeneficiaryPt,aes(reorder(Provider,NumberofBeneficiary),NumberofBeneficiary, fill=NumberofBeneficiary))+geom_bar(stat="identity")+coord_flip()+ylab("Number of Beneficiary per Day Services")+xlab("Provider")+ggtitle("Provider Type 46-70 categorized by Beneficiary per Day services")
+```
+
+## Average Medicare Allowed and Provider Type
+```{r}
+AllowedP=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(AllowedAmmount=mean(Average.Medicare.Allowed.Amount))
+AllowedP<- AllowedP[order(-AllowedP$AllowedAmmount),]
+AllowedP<- AllowedP[1:20,]
+AllowedPs=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(AllowedAmmount=mean(Average.Medicare.Allowed.Amount))
+AllowedPs<- AllowedPs[order(-AllowedPs$AllowedAmmount),]
+AllowedPs<- AllowedPs[1:20,]
+AllowedPt=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(AllowedAmmount=mean(Average.Medicare.Allowed.Amount))
+AllowedPt<- AllowedPt[order(-AllowedPt$AllowedAmmount),]
+AllowedPt<- AllowedPt[21:45,]
+```
+
+```{r}
+ggplot(AllowedP,aes(reorder(Provider,AllowedAmmount),AllowedAmmount,fill=AllowedAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Allowed")+xlab("Provider Type")+ggtitle("Provider Type 1-20 categorized by Average Medicare Allowed")
+ggplot(AllowedPs,aes(reorder(Provider,AllowedAmmount),AllowedAmmount,fill=AllowedAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Allowed")+xlab("Provider Type")+ggtitle("Provider Type 21-46 categorized by Average Medicare Allowed")
+ggplot(AllowedPt,aes(reorder(Provider,AllowedAmmount),AllowedAmmount,fill=AllowedAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Allowed")+xlab("Provider Type")+ggtitle("Provider Type 46-70 categorized by Average Medicare Allowed")
+```
+
+## Average Submitted Charge Amount and Provider Type
+```{r}
+ChargedP=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(ChargedAmmount=mean(Average.Submitted.Charge.Amount))
+ChargedP<- ChargedP[order(-ChargedP$ChargedAmmount),]
+ChargedP<- ChargedP[1:20,]
+ChargedPs=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(ChargedAmmount=mean(Average.Submitted.Charge.Amount))
+ChargedPs<- ChargedPs[order(-ChargedPs$ChargedAmmount),]
+ChargedPs<- ChargedPs[21:45,]
+ChargedPt=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(ChargedAmmount=mean(Average.Submitted.Charge.Amount))
+ChargedPt<- ChargedPt[order(-ChargedPt$ChargedAmmount),]
+ChargedPt<- ChargedPt[46:70,]
+```
+
+```{r}
+ggplot(ChargedP,aes(reorder(Provider,ChargedAmmount),ChargedAmmount,fill=ChargedAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Submitted Charge Amount")+xlab("Provider Type")+ggtitle("Provider Type 1-20 categorized by Average Submitted Charge Amount")
+ggplot(ChargedPs,aes(reorder(Provider,ChargedAmmount),ChargedAmmount,fill=ChargedAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Submitted Charge Amount")+xlab("Provider Type")+ggtitle("Provider Type 21-45 categorized by Average Submitted Charge Amount")
+ggplot(ChargedPt,aes(reorder(Provider,ChargedAmmount),ChargedAmmount,fill=ChargedAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Submitted Charge Amount")+xlab("Provider Type")+ggtitle("Provider Type 46-70 categorized by Average Submitted Charge Amount")
+```
+
+## Average Medicare Payment Amount and Provider Type
+```{r}
+PaymentP=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(PaymentAmmount=mean(Average.Medicare.Payment.Amount))
+PaymentP<- PaymentP[order(-PaymentP$PaymentAmmount),]
+PaymentP<- PaymentP[1:20,]
+PaymentPs=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(PaymentAmmount=mean(Average.Medicare.Payment.Amount))
+PaymentPs<- PaymentPs[order(-PaymentPs$PaymentAmmount),]
+PaymentPs<- PaymentPs[21:45,]
+PaymentPt=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(PaymentAmmount=mean(Average.Medicare.Payment.Amount))
+PaymentPt<- PaymentPt[order(-PaymentPt$PaymentAmmount),]
+PaymentPt<- PaymentPt[46:70,]
+```
+
+```{r}
+ggplot(PaymentP,aes(reorder(Provider,PaymentAmmount),PaymentAmmount,fill=PaymentAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Payment Amount")+xlab("Provider Type")+ggtitle("Provider Type 1-20 categorized by Average Medicare Payment Amount")
+ggplot(PaymentPs,aes(reorder(Provider,PaymentAmmount),PaymentAmmount,fill=PaymentAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Payment Amount")+xlab("Provider Type")+ggtitle("Provider Type 21-45 categorized by Average Medicare Payment Amount")
+ggplot(PaymentPt,aes(reorder(Provider,PaymentAmmount),PaymentAmmount,fill=PaymentAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Payment Amount")+xlab("Provider Type")+ggtitle("Provider Type 46-70 categorized by Average Medicare Payment Amount")
+```
+
+## Average Medicare Standardized Amount and Provider Type
+```{r}
+StandardP=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(StandardAmmount=mean(Average.Medicare.Standardized.Amount))
+StandardP <- StandardP[order(-StandardP$StandardAmmount),]
+StandardP <- StandardP[1:20,]
+StandardPs=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(StandardAmmount=mean(Average.Medicare.Standardized.Amount))
+StandardPs <- StandardPs[order(-StandardPs$StandardAmmount),]
+StandardPs <- StandardPs[21:45,]
+StandardPt=providerspokane%>%group_by(Provider=Provider.Type)%>%summarize(StandardAmmount=mean(Average.Medicare.Standardized.Amount))
+StandardPt <- StandardPt[order(-StandardPt$StandardAmmount),]
+StandardPt <- StandardPt[46:70,]
+```
+
+```{r}
+ggplot(StandardP,aes(reorder(Provider,StandardAmmount),StandardAmmount,fill=StandardAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Standard Amount")+xlab("Provider Type")+ggtitle("Provider Type 1-20 categorized by Average Medicare Standardizd Amount")
+ggplot(StandardPs,aes(reorder(Provider,StandardAmmount),StandardAmmount,fill=StandardAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Standard Amount")+xlab("Provider Type")+ggtitle("Provider Type 21-45 categorized by Average Medicare Standardizd Amount")
+ggplot(StandardPt,aes(reorder(Provider,StandardAmmount),StandardAmmount,fill=StandardAmmount))+geom_bar(stat="identity")+coord_flip()+ylab("Average Medicare Standard Amount")+xlab("Provider Type")+ggtitle("Provider Type 46-70 categorized by Average Medicare Standardizd Amount")
+```
+
+# Place of Service
+
+In these graphs, "O" is in reference to providers located in offices, and "F" refers to providers located in facilities. 
+
+
+## Number of Services and Place of Service
+```{r}
+PlaceServices=providerspokane%>%group_by(Place=Place.of.Service)%>%summarize(NumberofServices =sum(Number.of.Services))
+```
+
+```{r}
+ggplot(PlaceServices,aes(Place,NumberofServices,fill=Place))+geom_bar(stat="identity")+ylab("Number of Services")+xlab("Place")+ggtitle("Place Of Service Categorized by Number Of Services")
+```
+
+
+## Number of Beneficiary per day Services and Place of Service
+```{r}
+PlaceBeneficiary=providerspokane%>%group_by(Place =Place.of.Service)%>%summarize(NumberofBeneficiary=length(Number.of.Distinct.Medicare.Beneficiary.Per.Day.Services))
+```
+
+```{r}
+ggplot(PlaceBeneficiary,aes(Place,NumberofBeneficiary,fill=Place))+geom_bar(stat="identity")+ylab("Number of Beneficiary per Day Services")+xlab("Place")+ggtitle("Place Of Service Categorized by Beneficiary Services")
+```
+
+## Average Medicare Allowed and Place of Service
+```{r}
+PlaceAllowed=providerspokane%>%group_by(Place=Place.of.Service)%>%summarize(AllowedAmmount=mean(Average.Medicare.Allowed.Amount))
+```
+
+```{r}
+ggplot(PlaceAllowed,aes(Place,AllowedAmmount,fill=Place))+geom_bar(stat="identity")+ylab("Average Medicare Allowed")+xlab("Place")+ggtitle("Place Of Service Categorized by Average Medicare Allowed")
+```
+
+## Average Submitted Charge Amount and Place of Service
+```{r}
+PlaceCharged=providerspokane%>%group_by(Place=Place.of.Service)%>%summarize(ChargedAmmount=mean(Average.Submitted.Charge.Amount))
+```
+
+```{r}
+ggplot(PlaceCharged,aes(Place,ChargedAmmount,fill=Place))+geom_bar(stat="identity")+ylab("Average Submitted Charge Amount")+xlab("Place")+ggtitle("Place Of Service Categorized by Average Submitted Charge Amount")
+```
+
+## Average Medicare Payment Amount and Place of Service
+```{r}
+PlacePayment=providerspokane%>%group_by(Place=Place.of.Service)%>%summarize(PaymentAmmount=mean(Average.Medicare.Payment.Amount))
+```
+
+```{r}
+ggplot(PlacePayment,aes(Place,PaymentAmmount,fill=Place))+geom_bar(stat="identity")+ylab("Average Medicare Payment Amount")+xlab("Place")+ggtitle("Place Of Service Categorized by Average Medicare Payment Amount")
+```
+
+## Average Medicare Standardized Amount and Place of Service
+```{r}
+PlaceStandard=providerspokane%>%group_by(Place=Place.of.Service)%>%summarize(StandardAmmount=mean(Average.Medicare.Standardized.Amount))
+```
+
+```{r}
+ggplot(PlaceStandard,aes(Place,StandardAmmount,fill=Place))+geom_bar(stat="identity")+ylab("Average Medicare Standard Amount")+xlab("Place")+ggtitle("Place Of Service Categorized by Average Medicare Standardized Amount")
+```
+
+
+## Question 2
+How do all these variables vary as a function of the type of service that is being provided?
+
+For the gender variable, we had three categories: females, males, and non-specified. For the non-specified gender, we made these responses N/A and removed them, as they were skewing the averages of our data with the small sample and large outliers. In Spokane, Female providers have fewer services than male providers in medical fields, which are likely a result of the amount of female medical professionals there are on Average anywhere. The first bar graph shows this disparity clearly, as you can see that females have only half as many providers as males do in the Spokane area. There are also less people visiting providers whom are female, but this could simply be a result of there being less female providers available. Females generally have less available Medicare coverage for their services than male providers so, which would mean that they are involved in fields that are less common, less expensive, and less immediate and necessary (i.e. surgery, oncology, emergency room services). Because of this, Males submit more charges for their services and have higher payment amounts for Medicare. 
+ 
+For provider type compared to number of services, we put the providers in descending order by number of services provided.  We then graphed the providers in chunks, so that we could clearly see each provider, as they were very cramped for space all in one graph and not appealing to the eye. The gradient of blue emphasizes which provider has the highest amount on each graph (getting darker as the number decreases). The provider with the most services is Clinical Labs, as this is a very broad service that does a lot of different things, from research to testing to diagnosis of all kinds. They had about 1,250,000 services; The providers with the most services were mostly primary care doctors and oncologists. Pediatrics and geriatrics had the lease services because they are more specialized fields.  For average Medicare allowed, the ambulatory surgical center was first, because it is a service (emergency surgery) where the situation is immediate, necessary, and very expensive. Therefore, you need more Medicare coverage for this service. Ambulance services are the highest submitted charge as well as the highest Medicare coverage, this is because not long are ambulances expensive, but they are the most frequently used service on this list. Because preventative medicine is not exactly necessary, very expensive, or common; it is the lowest in submitted charge and Medicare coverage.
+ 
+For the place variable, there are two options: facilities or offices. Facilities are buildings such as hospitals and offices are buildings such as a primary care doctor or an orthopedic doctor. Offices are used more often for providers with more services because we can assume that patients needing care from these providers were referred there by facilities such as hospitals who don't specialize in that field. Facilities have higher Medicare coverage and submitted charges because they deal with patients who need immediate, expensive, and vital care such as surgery and ambulances.
+
+## Conclusion and Limitations
+In our findings, we found that all of our data can be divided essentially into two categories. These are providers in Spokane who have a lot of Medicare coverage and those who have less Medicare coverage. Providers who have a lot of coverage are, on average, Male. They usually run their services out of facilities such as hospitals. These Providers provide fewer services and these services are that are expensive, common, and absolutely necessary to their patients. Providers who have less Medicare coverage were generally Female and worked out of offices. These Providers provide more services and these services are less expensive, more specialized, and less common. 
+ 
+Some limitations to our findings included the unidentified gender variable, our knowledge of the ability to split the provider type variable into visuals that were concise and easy to understand due to the amount of providers we were presented with. We wanted to try to use other types of graphs to show our data to is fullest potential, but felt that bar graphs showed our data the most clearly every time. We had some trouble renaming data, such as the variables in Places of Service, so that it is easier for the reader to understand. A big limitation in the end was our lack of understanding of medical providers and the medical field in general, which made it very difficult to analyze our data in a detailed manner. 
+
+
